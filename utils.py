@@ -21,19 +21,19 @@ def set_seed(seed_number, env):
 def gs_kerl(x, y, dim_args, sigma = 20.0):
     # x, y: 2-D tensor, each of shape (batch_size * m, action_dims)
     batch_size, ac_dim = dim_args
-    xx = tf.transpose(tf.reshape(x, [-1, batch_size, ac_dim]), perm=[1, 2, 0]) 
-    yy = tf.transpose(tf.reshape(y, [-1, batch_size, ac_dim]), perm=[1, 2, 0]) 
-    kxy = tf.square(tf.reshape((tf.expand_dims(xx, axis = 3) - tf.expand_dims(yy, axis = 2)), [batch_size, ac_dim, -1]))
-    kxy = tf.reduce_sum(tf.exp(-tf.reduce_sum(kxy, axis = 1)/(2*(sigma))), axis = 1)  
+    xx = tf.reshape(x, [batch_size, -1, ac_dim])
+    yy = tf.reshape(x, [batch_size, -1, ac_dim])
+    kxy = tf.square(tf.expand_dims(xx, axis = 2) - tf.expand_dims(yy, axis = 1))
+    kxy = tf.reduce_mean(tf.exp(-tf.reduce_sum(kxy, axis = -1)/(sigma)), axis = (1,2))
     return kxy
-    
+
 def lp_kerl(x, y, dim_args, sigma = 10.0):
     # x, y: 2-D tensor, each of shape (batch_size * m, action_dims)
     batch_size, ac_dim = dim_args
-    xx = tf.transpose(tf.reshape(x, [-1, batch_size, ac_dim]), perm=[1, 2, 0]) 
-    yy = tf.transpose(tf.reshape(y, [-1, batch_size, ac_dim]), perm=[1, 2, 0]) 
-    kxy = tf.abs(tf.reshape((tf.expand_dims(xx, axis = 3) - tf.expand_dims(yy, axis = 2)), [batch_size, ac_dim, -1]))
-    kxy = tf.reduce_sum(tf.exp(-tf.reduce_sum(kxy, axis = 1)/(sigma)), axis = 1)
+    xx = tf.reshape(x, [batch_size, -1, ac_dim])
+    yy = tf.reshape(x, [batch_size, -1, ac_dim])
+    kxy = tf.abs(tf.expand_dims(xx, axis = 2) - tf.expand_dims(yy, axis = 1))
+    kxy = tf.reduce_mean(tf.exp(-tf.reduce_sum(kxy, axis = -1)/(sigma)), axis = (1,2))
     return kxy
 
 def mm_distance(x,y, num_sample, dim_args, sigma = 10.0, k_type = 'lp', flags = None):
