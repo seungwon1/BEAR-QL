@@ -13,7 +13,7 @@ This repository contains Tensorflow implementation of BEAR Q-Learning to reprodu
 ## Results
 Below command reproduce experiments done in the paper (It assumes static dataset is in buffers/).
 ```
-python main.py --game=Ant --version=v2 --it=1000000 --batch=256 --lr=1e-3 --sample_p=10 --sample=5 --eval_freq=1000 --buffer=buffer_filename
+python main.py --game=Ant --version=v2 --it=1000000 --batch=256 --lr=1e-3 --sample_p=10 --sample=5 --eval_freq=1000 --buffer=buffer_filename --kernel=gs --sigma=20.0
 ```
 Args
 ```
@@ -25,6 +25,8 @@ Args
 -sample : number of action samples for MMD
 -eval_freq : evaluation interval
 -buffer : name of buffer file
+-kernel : kernel for calculating mmd
+-sigma : constant for kernel
 ```
 Below figures show the results of experiments with different datasets (Top:paper, Bottom:ours).
 
