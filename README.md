@@ -1,14 +1,14 @@
 # BEAR-QL
 
-This repository contains Tensorflow implementation of BEAR Q-Learning to reproduce the experiments described in the paper ["Stabilizing Off-Policy Q-Learning via Bootstrapping Error Reduction "](https://arxiv.org/abs/1906.00949) for NeurIPS 2019 Reproducibility Challenge (https://reproducibility-challenge.github.io/neurips2019/).
+This repository contains Tensorflow implementation of BEAR Q-Learning to reproduce the experiments described in ["Stabilizing Off-Policy Q-Learning via Bootstrapping Error Reduction"](https://arxiv.org/abs/1906.00949) for [NeurIPS 2019 Reproducibility Challenge](https://openreview.net/forum?id=S1lXO6cf6S).
 
 ## Dependencies
 - Python 3.6 or greater
-- Tensorflow 1.14.0
+- Tensorflow 1.15.4
 - Numpy 1.17.3
-- OpenAI Gym version 0.10.5
+- OpenAI Gym version 0.12.2
 - Matplotlib
-- Mujoco version 2.0 and mujoco_py-2.0.2.8
+- Mujoco version 1.50 and mujoco_py-1.50.1.56
 
 ## Results
 Below command reproduce experiments done in the paper (It assumes static dataset is in buffers/).

@@ -24,7 +24,7 @@ def gs_kerl(x, y, dim_args, sigma = 20.0):
     xx = tf.reshape(x, [batch_size, -1, ac_dim])
     yy = tf.reshape(y, [batch_size, -1, ac_dim])
     kxy = tf.square(tf.expand_dims(xx, axis = 2) - tf.expand_dims(yy, axis = 1))
-    kxy = tf.reduce_sum(tf.exp(-tf.reduce_sum(kxy, axis = -1)/(sigma)), axis = (1,2))
+    kxy = tf.reduce_sum(tf.exp(-tf.reduce_sum(kxy, axis = -1)/(2*(sigma)**2)), axis = (1,2))
     return kxy
 
 def lp_kerl(x, y, dim_args, sigma = 10.0):
@@ -36,13 +36,15 @@ def lp_kerl(x, y, dim_args, sigma = 10.0):
     kxy = tf.reduce_sum(tf.exp(-tf.reduce_sum(kxy, axis = -1)/(sigma)), axis = (1,2))
     return kxy
 
-def mm_distance(x,y, num_sample, dim_args, sigma = 10.0, k_type = 'lp', flags = None):
+def mm_distance(x,y, num_sample, dim_args, flags = None):
     # x, y: 2-D tensor, each of shape (batch_size * m, action_dims)
-    if flags.game == 'Walker2d' or 'Ant':
-        sigma = 20.0
+    sigma = flags.sigma
+    #if flags.game == 'Walker2d' or 'Ant':
+    #    sigma = 20.0
     
     n, m = num_sample
-    if k_type == 'lp':
+    
+    if flags.kernel == 'lp':
         mmd = lp_kerl(x, x, dim_args, sigma)/(n**2) - 2*lp_kerl(x, y, dim_args, sigma)/(n*m) + lp_kerl(y, y, dim_args, sigma)/(m**2)
     else:
         mmd = gs_kerl(x, x, dim_args, sigma)/(n**2) - 2*gs_kerl(x, y, dim_args, sigma)/(n*m) + gs_kerl(y, y, dim_args, sigma)/(m**2)
