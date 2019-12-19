@@ -17,7 +17,7 @@ class BEAR_model(object):
                 fc2 = tf.contrib.layers.fully_connected(tf.concat([obs, act], axis=1), 400, activation_fn=tf.nn.relu)
                 fc2 = tf.contrib.layers.fully_connected(fc2, 300, activation_fn=tf.nn.relu)
                 fc2 = tf.contrib.layers.fully_connected(fc2, 1, activation_fn=None)
-                
+
         return tf.concat([fc, fc2], axis = 1)
     
     def actor(self, obs, network, size = 1, reuse=False):
@@ -51,7 +51,7 @@ class VAE(object):
                 act_logstd = tf.clip_by_value(tf.contrib.layers.fully_connected(fc, self.latent_dim, activation_fn=None), -4, 15)
                 std = tf.exp(act_logstd)
         
-        z = act_mean + tf.random.normal(shape = tf.shape(std), mean= 0.0, stddev=std, dtype=tf.dtypes.float32)
+        z = act_mean + std * tf.random.normal(shape = tf.shape(std), mean= 0.0, stddev=1.0, dtype=tf.dtypes.float32)
         recon_vec, _ = self.decoder(obs = obs, z = z)
         return (recon_vec, act_mean, std)
         
@@ -62,7 +62,7 @@ class VAE(object):
         if z is None:
             mean = tf.constant(0.0, shape= [self.batch_size*size, self.latent_dim])
             std =  tf.constant(1.0, shape= [self.batch_size*size, self.latent_dim])
-            z = tf.clip_by_value(mean + tf.random.normal(shape = tf.shape(std), mean= 0.0, stddev=std, dtype=tf.dtypes.float32), -0.5, 0.5)
+            z = tf.clip_by_value(mean + tf.random.normal(shape = tf.shape(std), mean= 0.0, stddev=1.0, dtype=tf.dtypes.float32), -0.5, 0.5)
         
         with tf.variable_scope(network, reuse=reuse):
             with tf.variable_scope('fc'):

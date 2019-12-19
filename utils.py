@@ -39,9 +39,6 @@ def lp_kerl(x, y, dim_args, sigma = 10.0):
 def mm_distance(x,y, num_sample, dim_args, flags = None):
     # x, y: 2-D tensor, each of shape (batch_size * m, action_dims)
     sigma = flags.sigma
-    #if flags.game == 'Walker2d' or 'Ant':
-    #    sigma = 20.0
-    
     n, m = num_sample
     
     if flags.kernel == 'lp':

@@ -8,7 +8,7 @@ from utils import lp_kerl, mm_distance, get_session, set_seed, replay_buffer
 from matplotlib import pyplot as plt
 
 class BEAR_qlearner(object):
-    def __init__(self, env, model, FLAGS, graph_args = {'p':10, 'm':5, 'n':5, 'lambda':0.75, 'var_lambda':0.4, 'lr':1e-3,
+    def __init__(self, env, model, FLAGS, graph_args = {'p':5, 'm':5, 'n':5, 'lambda':0.75, 'var_lambda':0.4, 'lr':1e-3,
                                                         'eps':0.05, 'tau':5e-3, 'gamma':0.99, 'batch_size':256, 'eval_freq':1000}):
         self.env = env
         self.model = model
@@ -60,7 +60,7 @@ class BEAR_qlearner(object):
         self.update_act_vars = self.update_vars(self.policy_vars, self.target_policy_vars, tau = self.tau)
         with tf.variable_scope('dual'):
             self.dual_var = tf.get_variable('dual_var', initializer = tf.constant(np.random.randn(1,).astype('float32')),
-                                            constraint=lambda x: tf.clip_by_value(x, 0, 10), dtype=tf.float32)
+                                            constraint=lambda x: tf.clip_by_value(x, -5, 10), dtype=tf.float32)
         self.dual_collection = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope = 'dual')
         
         # define VAE loss
@@ -81,12 +81,12 @@ class BEAR_qlearner(object):
         actor_loss = tf.reduce_mean(tf.reshape(actor_loss, [self.m, tf.shape(self.ob)[0], -1]), axis = 0) 
         std = self.var_ld * tf.sqrt(tf.clip_by_value(tf.math.reduce_std(actor_loss, axis = 1), 0, 10)) 
         actor_loss = tf.reduce_min(actor_loss, axis = 1) 
-        self.mmd = tf.sqrt(mm_distance(raw_act_m, raw_act_n, (self.m, self.n), (self.batch_size, self.ac_dim), k_type = 'lp', flags = self.flags)+1e-5)
-        self.actor_loss = tf.reduce_mean(-actor_loss + tf.stop_gradient(std) + tf.exp(self.dual_var)* (self.mmd-self.eps))  
+        self.mmd = tf.sqrt(mm_distance(raw_act_m, raw_act_n, (self.m, self.n), (self.batch_size, self.ac_dim), flags = self.flags) +1e-5)
+        self.actor_loss = tf.reduce_mean(-actor_loss + tf.stop_gradient(std) + tf.exp(self.dual_var)* (self.mmd-self.eps))
         act_gradients = tf.train.AdamOptimizer(self.learning_rate).compute_gradients(self.actor_loss, var_list = self.policy_vars)
         self.train_actor = tf.train.AdamOptimizer(self.learning_rate).apply_gradients(act_gradients)
-        self.dual_loss = - tf.reduce_mean(-actor_loss + std + tf.exp(self.dual_var) * (self.mmd - self.eps))
-        dual_grad = tf.train.AdamOptimizer(self.learning_rate).compute_gradients(self.dual_loss, var_list = self.dual_collection)
+        self.dual_loss = tf.reduce_mean(-actor_loss + std + tf.exp(self.dual_var) * (self.mmd - self.eps))
+        dual_grad = tf.train.AdamOptimizer(self.learning_rate).compute_gradients(-self.dual_loss, var_list = self.dual_collection)
         self.train_lagrange= tf.train.AdamOptimizer(self.learning_rate).apply_gradients(dual_grad)
         
     def update_vars(self, online_vars, target_vars, tau):
@@ -120,7 +120,7 @@ class BEAR_qlearner(object):
             critic_loss, _ = sess.run([self.critic_loss, self.train_critic],
                                      feed_dict = {self.ob:s, self.ac:a, self.rew:r, self.done:done, self.next_ob:ns})
             
-            # train actor using dual gradient descent
+            #train actor using dual gradient descent
             act_loss, _ = sess.run([self.actor_loss, self.train_actor], feed_dict = {self.ob:s})
             dual_loss, _,  = sess.run([self.dual_loss, self.train_lagrange], feed_dict = {self.ob:s})
             
@@ -137,7 +137,7 @@ class BEAR_qlearner(object):
             
     def build_action_selection(self):
         action_samples, _ = self.model.actor(self.ob, size = self.m, network='online_act', reuse = True) 
-        action_idx = tf.reduce_sum(self.model.critic(tf.tile(self.ob, [self.m, 1]), action_samples, network='online_crt',reuse = True)* tf.one_hot(tf.zeros(shape = tf.shape(action_samples)[0], dtype = tf.int32), 2, dtype='float32'), axis = 1) 
+        action_idx = tf.reduce_sum(self.model.critic(tf.tile(self.ob, [self.m, 1]), action_samples, network='online_crt',reuse = True)* tf.one_hot(tf.zeros(shape = tf.shape(action_samples)[0], dtype = tf.int32), 2, dtype='float32'), axis = 1)  # k = 2
         action_idx = tf.argmax(tf.reshape(action_idx, [self.m, -1]), axis = 0) 
         self.action = tf.reduce_sum(tf.transpose(tf.reshape(action_samples, [self.m, tf.shape(self.ob)[0], -1]), perm = [1,0,2]) * tf.expand_dims(tf.one_hot(action_idx, self.m, dtype='float32'), -1), axis = 1)
         
@@ -146,7 +146,7 @@ class BEAR_qlearner(object):
             self.build_action_selection()
             self.reward_his = []
             print('---------------------------------------------------------')
-            print('Train BEAR on ' + self.flags.game+'-'+ self.flags.version)
+            print('Train BEAR on ' + self.flags.game+'-'+ self.flags.version + ' with ' + self.flags.buffer)
             print('---------------------------------------------------------')
             
         reward = []
