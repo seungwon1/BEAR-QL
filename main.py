@@ -20,10 +20,12 @@ flags.DEFINE_integer('seed', 7701, 'seed')
 flags.DEFINE_integer('it', 1000000, 'training step')
 flags.DEFINE_integer('batch', 256, 'training step')
 flags.DEFINE_float('lr', 1e-3, 'training step')
-flags.DEFINE_integer('sample_p', 10, 'training step')
+flags.DEFINE_integer('sample_p', 5, 'training step')
 flags.DEFINE_integer('sample', 5, 'training step')
 flags.DEFINE_integer('eval_freq', 1000, 'training step')
 flags.DEFINE_string('exp', 'exp', 'experiment name')
+flags.DEFINE_string('kernel', 'lp', 'kernel for mmd')
+flags.DEFINE_float('sigma', 10.0, 'sigma for mmd')
 flags.DEFINE_string('buffer', 'buffers', 'file name of buffer')
 
 def train_bear():
