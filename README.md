@@ -13,7 +13,7 @@ This repository contains Tensorflow implementation of BEAR Q-Learning to reprodu
 ## Results
 Below command reproduce experiments done in the paper (It assumes static dataset is in buffers/).
 ```
-python main.py --game=Ant --version=v2 --it=1000000 --batch=256 --lr=1e-3 --sample_p=10 --sample=5 --eval_freq=1000 --buffer=buffer_filename --kernel=gs --sigma=20.0
+python main.py --game=Ant --version=v2 --it=1000000 --batch=100 --lr=1e-3 --sample_p=5--sample=5 --eval_freq=1000 --buffer=buffer_filename --kernel=gs --sigma=20.0
 ```
 Args
 ```
@@ -28,7 +28,15 @@ Args
 -kernel : kernel for calculating mmd
 -sigma : constant for kernel
 ```
-Below figures show the results of experiments with different datasets (Top:paper, Bottom:ours).
+
+Hyper-parameters used for BEAR-QL
+```
+- batch size = 100, learning rate = 1e-3, sample_p = 5, sample = 5, eval_freq = 1000
+- kernel : gs(gaussian kernel) for medium-quality dataset of Walker2d-v2 and Ant-v2 and random dataset of HalfCheetah-v2, lp(laplacian kernel) for others
+- sigma : 10.0 for HalfCheetah-v2 and Hopper-v2, 20.0 for Walker2d-v2 and Ant-v2
+```
+
+Below figures show the results of experiments with different datasets (Top:paper, Bottom:ours). The official implementations of [BCQ](https://github.com/sfujim/BCQ) and [TD3](https://github.com/sfujim/TD3) are used for baseline algorithms. 
 
 ### Medium quality Dataset
 ![me_paper](figure/me.png)
