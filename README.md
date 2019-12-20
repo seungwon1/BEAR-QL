@@ -36,7 +36,7 @@ Hyper-parameters used for BEAR-QL
 - sigma : 10.0 for HalfCheetah-v2 and Hopper-v2, 20.0 for Walker2d-v2 and Ant-v2
 ```
 
-Below figures show the results of experiments with different datasets (Top:paper, Bottom:ours). The official implementations of [BCQ](https://github.com/sfujim/BCQ) and [TD3](https://github.com/sfujim/TD3) are used for baseline algorithms. 
+Below figures show the results of experiments with different datasets (Top:paper, Bottom:ours). The official implementations of [BCQ](https://github.com/sfujim/BCQ) and [TD3](https://github.com/sfujim/TD3) are used for baseline algorithms. Each algorithm is trained on a single RTX 2080 ti.
 
 ### Medium quality Dataset
 ![me_paper](figure/me.png)
