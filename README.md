@@ -4,14 +4,17 @@ This repository contains Tensorflow implementation of BEAR Q-Learning to reprodu
 
 ## Dependencies
 - Python 3.6 or greater
-- Tensorflow 1.15.4
-- Numpy 1.17.3
-- OpenAI Gym version 0.12.2
+- Tensorflow 1.14.0
+- Numpy 1.15.4
+- OpenAI Gym version 0.12.5
 - Matplotlib
 - Mujoco version 1.50 and mujoco_py-1.50.1.56
 
-## Results
-Below command reproduce experiments done in the paper (It assumes static dataset is in buffers/).
+## Dataset
+BEAR Q-Learning is an off-policy RL algorithm and it is trained on static datset. You can generate dataset using [Soft Actor-Critic (SAC)](https://github.com/rail-berkeley/softlearning) algorithm as denoted in the paper or directly download [our datasets](https://github.com/seungwon1/BEAR-QL/tree/master/buffers) used in reproducibility report.
+
+## Train BEAR-QL
+To train BEAR-QL, execute below command (It assumes static dataset is in buffers/).
 ```
 python main.py --game=Ant --version=v2 --it=1000000 --batch=100 --lr=1e-3 --sample_p=5--sample=5 --eval_freq=1000 --buffer=buffer_filename --kernel=gs --sigma=20.0
 ```
@@ -36,7 +39,14 @@ Hyper-parameters used for BEAR-QL
 - sigma : 10.0 for HalfCheetah-v2 and Hopper-v2, 20.0 for Walker2d-v2 and Ant-v2
 ```
 
-Below figures show the results of experiments with different datasets (Top:paper, Bottom:ours). The official implementations of [BCQ](https://github.com/sfujim/BCQ) and [TD3](https://github.com/sfujim/TD3) are used for baseline algorithms. Each algorithm is trained on a single RTX 2080 ti.
+Metrics such as loss or evaluation reward can be easily visualized using tensorboard.
+```
+tensorboard --logdir=results/directory_name
+```
+
+## Results
+
+Below figures show the results of experiments with different datasets (Top:paper, Bottom:ours). The official implementations of [BCQ](https://github.com/sfujim/BCQ) and [TD3](https://github.com/sfujim/TD3) are used for baseline algorithms. 
 
 ### Medium quality Dataset
 ![me_paper](figure/me.png)
@@ -49,3 +59,7 @@ Below figures show the results of experiments with different datasets (Top:paper
 ### Optimal Dataset
 ![op_paper](figure/op.png)
 ![op_ours](figure/optim.png)
+
+
+## Hardware
+Each algorithm is trained on a single RTX 2080 ti.
