@@ -1,6 +1,6 @@
 import tensorflow as tf
 import numpy as np
-import gzip, pickle
+import gzip, pickle, csv
 from matplotlib import pyplot as plt
 import os, random
 
@@ -67,3 +67,34 @@ class replay_buffer(object):
         idx = np.random.randint(self.state.shape[0],size=batch_size)
         s, ns, a, r, d = self.state[idx], self.next_state[idx], self.action[idx], self.reward[idx], self.done[idx]
         return s, ns, a, r, d
+    
+class progress_stats(object):
+    
+    def __init__(self, logdir):
+        self.iters = []
+        self.vae_loss = []
+        self.crt_loss = []
+        self.act_loss = []
+        self.dual_loss = []
+        self.mmd = []
+        self.eval_reward = []
+        self.eval_reward_std = []
+        self.logdir = logdir
+        
+    def add(self, iters, vae_loss, crt_loss, act_loss, dual_loss, mmd, eval_rew = None, eval_rew_std = None):
+        self.iters.append(iters)
+        self.vae_loss.append(vae_loss)
+        self.crt_loss.append(crt_loss)
+        self.act_loss.append(act_loss)
+        self.dual_loss.append(dual_loss)
+        self.mmd.append(mmd)
+        self.eval_reward.append(eval_rew)
+        self.eval_reward_std.append(eval_rew_std)
+        
+    def save_csv(self):
+        with open(self.logdir + 'progress.csv', 'w') as f:
+            f.write("iteration, vae_loss, crt_loss, act_loss, dual_loss, mmd, eval_reward, eval_reward_std\n")
+            writer = csv.writer(f, delimiter=',')
+            writer.writerows(zip(self.iters, self.vae_loss, self.crt_loss, self.act_loss, self.dual_loss, 
+                                 self.mmd, self.eval_reward, self.eval_reward_std))
+            
